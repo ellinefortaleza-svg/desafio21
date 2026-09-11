@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desafio 21 Dias — Elline & Juliana</title>
+<style>
+  :root{
+    --bg: #FFF9F0;
+    --ink: #201A2E;
+    --muted: #7A7188;
+    --e: #FF5D3A;
+    --e-dark: #D8401F;
+    --e-soft: #FFE3D9;
+    --j: #00B3A4;
+    --j-dark: #00877C;
+    --j-soft: #D3F5F1;
+    --purple: #7B5CFA;
+    --yellow: #FFC93C;
+    --line: #F0E4D8;
+    --card: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  body{
+    margin:0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap{ max-width: 960px; margin: 0 auto; padding: 0 20px 90px; }
+
+  .hero{
+    background: linear-gradient(120deg, var(--e) 0%, #FF8A3D 32%, var(--purple) 68%, var(--j) 100%);
+    padding: 64px 20px 56px;
+    border-radius: 0 0 32px 32px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; right:-60px; top:-60px; width:260px; height:260px;
+    background: rgba(255,255,255,0.12); border-radius: 50%;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; left:-40px; bottom:-80px; width:200px; height:200px;
+    background: rgba(255,255,255,0.10); border-radius: 50%;
+  }
+  .hero-inner{ max-width: 920px; margin: 0 auto; position: relative; z-index: 2; }
+  .kicker{
+    display:inline-block;
+    letter-spacing: 2px; font-size: 12px; font-weight: 700;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 14px; border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  .hero h1{
+    font-size: 46px; margin: 0 0 12px; line-height: 1.05; font-weight: 900;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.12);
+  }
+  .hero .dates{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size: 16px; font-weight: 700; margin-bottom: 16px;
+    background: rgba(0,0,0,0.18); padding: 8px 16px; border-radius: 999px;
+  }
+  .hero p.lead{ font-size: 16.5px; max-width: 620px; margin: 0; opacity: 0.96; }
+
+  #sync-badge{ display:inline-flex; align-items:center; gap:6px; margin-top:14px; font-size:12.5px; font-weight:700; background:rgba(0,0,0,0.18); padding:6px 14px; border-radius:999px; }
+  #sync-badge.offline{ background: rgba(200,40,40,0.35); }
+
+  .progress-block{ margin-top: 30px; }
+  .progress-row{ display:flex; gap:16px; flex-wrap: wrap; margin-top: 14px; }
+  .progress-card{
+    flex:1; min-width: 220px; background: rgba(255,255,255,0.97); border-radius: 14px;
+    padding: 16px 18px; box-shadow: 0 8px 22px rgba(0,0,0,0.12); color: var(--ink);
+  }
+  .progress-card .pc-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; }
+  .progress-card .pc-label{ font-size:13px; font-weight:800; color: var(--muted); text-transform:uppercase; letter-spacing:0.4px; }
+  .progress-card.e .pc-label{ color: var(--e-dark); }
+  .progress-card.j .pc-label{ color: var(--j-dark); }
+  .progress-card .pc-pct{ font-size:22px; font-weight:900; }
+  .progress-bar-bg{ background: #EFE9DD; border-radius: 999px; height: 12px; overflow:hidden; }
+  .progress-bar-fill{ height:100%; border-radius:999px; width:0%; transition: width 0.4s ease; background: var(--purple); }
+  .progress-card.e .progress-bar-fill{ background: linear-gradient(90deg, var(--e), #FF8A3D); }
+  .progress-card.j .progress-bar-fill{ background: linear-gradient(90deg, var(--j-dark), var(--j)); }
+
+  .progress-card.big{ width: 100%; padding: 22px 26px; }
+  .progress-card.big .pc-label{ font-size:15px; }
+  .progress-card.big .pc-pct{ font-size:34px; }
+  .progress-card.big .progress-bar-bg{ height: 20px; }
+  .progress-row.two{ flex-wrap: nowrap; }
+  .progress-row.two .progress-card{ min-width: 0; }
+  @media (max-width: 560px){
+    .progress-row.two{ flex-wrap: wrap; }
+  }
+
+  .scoreboard{ display:flex; gap:18px; margin-top:22px; flex-wrap: wrap; }
+  .player-card{
+    flex: 1; min-width: 260px; background: rgba(255,255,255,0.97); color: var(--ink);
+    border-radius: 16px; padding: 22px 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  }
+  .player-card .name{ font-size: 21px; font-weight: 800; margin-bottom: 14px; display:flex; align-items:center; gap:8px; }
+  .player-card.e .name{ color: var(--e-dark); }
+  .player-card.j .name{ color: var(--j-dark); }
+  .field{ display:flex; justify-content: space-between; align-items:center; padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+  .field:last-child{ border-bottom:none; }
+  .field span.lbl{ color: var(--muted); font-weight: 600;}
+  .field input{ border: none; border-bottom: 2px solid #E8DFD2; background: transparent; text-align: right; width: 90px; font-size: 14.5px; font-family: inherit; padding: 3px 0; color: var(--ink); font-weight:700; }
+  .field input:focus{ outline: none; border-bottom-color: var(--purple); }
+
+  section{ margin-top: 58px; }
+  section .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size: 13px; font-weight: 800; color: var(--purple);
+    background: #EFE9FF; padding: 5px 14px; border-radius: 999px; margin-bottom: 10px;
+  }
+  section h2{ font-size: 27px; margin: 0 0 6px; font-weight: 900; }
+  section p.section-sub{ color: var(--muted); margin: 0 0 22px; font-size: 15px; max-width: 640px; }
+
+  .rules-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .rule-card{
+    background: var(--card); border-radius: 14px; padding: 18px 20px; font-size: 14.5px;
+    box-shadow: 0 6px 18px rgba(120,90,50,0.08);
+    border-top: 4px solid var(--yellow);
+  }
+  .rule-card:nth-child(2){ border-top-color: var(--e); }
+  .rule-card:nth-child(3){ border-top-color: var(--j); }
+  .rule-card:nth-child(4){ border-top-color: var(--purple); }
+  .rule-card b{ display:block; margin-bottom: 5px; font-size: 15.5px;}
+
+  .tasks-card{
+    background: linear-gradient(135deg, #201A2E, #3A2E52);
+    color: #FFF9F0; border-radius: 16px; padding: 26px 28px; margin-top: 20px;
+    box-shadow: 0 10px 26px rgba(32,26,46,0.25);
+  }
+  .tasks-card b{ display:flex; align-items:center; gap:8px; margin-bottom: 14px; font-size: 16px; color: var(--yellow);}
+  .tasks-card ul{ margin: 0; padding-left: 0; columns: 2; column-gap: 26px; list-style:none; }
+  .tasks-card li{ margin-bottom: 10px; font-size: 14.5px; break-inside: avoid; }
+  .tasks-card label{ display:flex; align-items:center; gap:10px; cursor:pointer; }
+  .tasks-card input[type=checkbox]{ width: 18px; height: 18px; accent-color: var(--j); cursor:pointer; flex-shrink:0; }
+
+  table.workout{
+    width: 100%; border-collapse: separate; border-spacing: 0 8px;
+    font-size: 14px;
+  }
+  table.workout tr{ background: var(--card); }
+  table.workout td{ padding: 13px 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  table.workout td:first-child{ border-left: 1px solid var(--line); border-radius: 12px 0 0 12px; font-weight: 800; }
+  table.workout td:last-child{ border-right: 1px solid var(--line); border-radius: 0 12px 12px 0; color: var(--muted); }
+  table.workout td.foco{ font-weight: 700; color: var(--e-dark); }
+
+  .workout-cards{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .workout-day-card{
+    background: var(--card); border-radius: 14px; padding: 18px 20px;
+    box-shadow: 0 6px 18px rgba(120,90,50,0.08); border-left: 5px solid var(--purple);
+  }
+  .workout-day-card.rest{ border-left-color: var(--line); opacity: 0.8; }
+  .wd-top{ display:flex; align-items:center; gap: 10px; margin-bottom: 12px; }
+  .wd-letter{
+    display:inline-flex; align-items:center; justify-content:center;
+    width: 30px; height: 30px; border-radius: 50%; background: var(--purple); color:#fff;
+    font-weight: 900; font-size: 14px; flex-shrink:0;
+  }
+  .workout-day-card.rest .wd-letter{ background: var(--muted); }
+  .wd-day{ font-weight: 800; font-size: 14.5px; }
+  .workout-day-card ul{ margin:0; padding-left: 18px; }
+  .workout-day-card li{ font-size: 13.5px; color: #444; margin-bottom: 6px; }
+  .workout-day-card li b{ color: var(--e-dark); font-weight: 800; }
+  @media (max-width: 700px){ .workout-cards{ grid-template-columns: 1fr; } }
+
+  .diet-cards{ display:grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .diet-card{
+    background: var(--card); border-radius: 14px; padding: 15px 15px; font-size: 13px;
+    box-shadow: 0 6px 16px rgba(120,90,50,0.08);
+    border-bottom: 4px solid var(--j);
+  }
+  .diet-card:nth-child(2){ border-bottom-color: var(--purple); }
+  .diet-card:nth-child(3){ border-bottom-color: var(--yellow); }
+  .diet-card:nth-child(4){ border-bottom-color: var(--e); }
+  .diet-card:nth-child(5){ border-bottom-color: var(--j-dark); }
+  .diet-card .day{ font-weight: 800; margin-bottom: 8px; font-size: 14px; color: var(--ink);}
+  .diet-card .item{ color: #555; margin-bottom: 4px; }
+  .diet-card .item b{ color: var(--ink); font-weight: 700; }
+  .meals-note{
+    background: linear-gradient(120deg, var(--e-soft), var(--j-soft));
+    border-radius: 12px; padding: 16px 20px; font-size: 14.5px; margin-top: 18px;
+  }
+
+  .week-block{ margin-bottom: 42px; }
+  .week-badge{
+    display:inline-flex; align-items:center; gap:10px;
+    font-size: 18px; font-weight: 900; margin: 0 0 4px;
+    background: var(--purple); color:#fff; padding: 8px 18px; border-radius: 999px;
+  }
+  .week-block:nth-of-type(2) .week-badge{ background: var(--e); }
+  .week-block:nth-of-type(3) .week-badge{ background: var(--j-dark); }
+  .week-block .range{ font-size: 13.5px; color: var(--muted); margin: 10px 0 14px; font-weight:600; }
+
+  table.checklist{
+    width: 100%; border-collapse: collapse; background: var(--card); border-radius: 14px; overflow: hidden;
+    font-size: 13.5px; box-shadow: 0 8px 22px rgba(120,90,50,0.10);
+  }
+  table.checklist th, table.checklist td{ padding: 11px 12px; text-align: center; border-bottom: 1px solid var(--line); }
+  table.checklist td.date{ text-align: left; font-weight: 700; white-space: nowrap; }
+  table.checklist th{ font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.4px; color: #fff; font-weight:700; }
+  table.checklist th.hdr-e{ background: var(--e); }
+  table.checklist th.hdr-j{ background: var(--j-dark); }
+  table.checklist th.hdr-date{ background: var(--ink); }
+  table.checklist td.cell-e{ background: var(--e-soft); }
+  table.checklist td.cell-j{ background: var(--j-soft); }
+  table.checklist tr:nth-child(odd) td.cell-e{ background: #FFF0E9; }
+  table.checklist tr:nth-child(odd) td.cell-j{ background: #E6F8F5; }
+  table.checklist tr:last-child td{ border-bottom: none; }
+  table.checklist input[type=checkbox]{ width: 19px; height: 19px; accent-color: var(--purple); cursor: pointer; }
+
+  .weekend-result{ display:flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+  .weekend-result .box{
+    flex:1; min-width: 220px; background: var(--card); border-radius: 14px; padding: 16px 18px; font-size: 13.5px;
+    box-shadow: 0 6px 16px rgba(120,90,50,0.08);
+  }
+  .weekend-result .box b{ display:flex; align-items:center; gap:6px; margin-bottom: 8px; font-size: 12.5px; color: var(--purple); text-transform: uppercase; letter-spacing: 0.4px; }
+  .weekend-result input[type=text]{ border: none; border-bottom: 2px solid #E8DFD2; background: transparent; font-size: 14.5px; font-family: inherit; padding: 4px 0; width: 100%; color: var(--ink); font-weight:600; }
+  .weekend-result input[type=text]:focus{ outline:none; border-bottom-color: var(--purple); }
+  .auto-points{ font-size: 16px; font-weight: 800; }
+  .auto-points .e{ color: var(--e-dark); }
+  .auto-points .j{ color: var(--j-dark); }
+  .auto-points .lead{ font-size: 11.5px; font-weight: 700; color: var(--purple); background: #EFE9FF; padding: 2px 10px; border-radius: 999px; margin-left: 6px; vertical-align: middle; }
+
+  .final-box{
+    background: linear-gradient(120deg, var(--yellow), #FFA53C);
+    border-radius: 16px; padding: 22px 26px; margin-top: 10px;
+    box-shadow: 0 10px 26px rgba(255,169,60,0.3);
+  }
+  .final-box b{ display:block; margin-bottom: 10px; font-size: 15px; color: #4A2E00; }
+  .final-box input[type=text]{
+    border: none; border-bottom: 2px solid rgba(74,46,0,0.35); background: transparent; font-size: 15px;
+    font-family: inherit; padding: 5px 0; width: 100%; color: #3A2400; font-weight:700;
+  }
+  .final-box input[type=text]:focus{ outline:none; }
+
+  .points-explain{ display:flex; gap: 14px; flex-wrap: wrap; }
+  .points-explain .pill{
+    background: var(--card); border-radius: 999px; padding: 11px 20px; font-size: 14px; font-weight:600;
+    box-shadow: 0 6px 16px rgba(120,90,50,0.08);
+  }
+  .points-explain .pill b{ color: var(--e-dark); font-size: 16px; }
+
+  /* ---------- TABS ---------- */
+  .tabs{ display:flex; gap:10px; margin-top: 32px; flex-wrap: wrap; }
+  .tab-btn{
+    font-family: inherit; font-size: 15px; font-weight: 800; padding: 12px 22px;
+    border-radius: 999px; border: none; cursor: pointer;
+    background: var(--card); color: var(--muted); box-shadow: 0 6px 16px rgba(120,90,50,0.08);
+  }
+  .tab-btn.active{ background: linear-gradient(120deg, var(--purple), var(--e)); color: #fff; }
+
+  /* ---------- RECEITAS ---------- */
+  .recipe-day-card{
+    background: var(--card); border-radius: 14px; padding: 20px 22px; margin-bottom: 18px;
+    box-shadow: 0 6px 18px rgba(120,90,50,0.08); border-left: 5px solid var(--purple);
+  }
+  .recipe-day-card .rd-top{ margin-bottom: 6px; }
+  .recipe-day-card .rd-day{ font-size: 19px; font-weight: 900; }
+  .recipe-day-card .block-label{ font-size: 12.5px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; margin: 16px 0 8px; }
+  .recipe-day-card select{
+    font-family: inherit; font-size: 14px; font-weight:700; padding: 9px 14px; border-radius: 10px;
+    border: 2px solid var(--line); background: #FAF8F4; color: var(--ink); cursor:pointer; width: 100%;
+  }
+  .chip-row{ display:flex; flex-wrap: wrap; gap: 8px; }
+  .chip{
+    display:inline-flex; align-items:center; gap:6px; padding: 7px 14px; border-radius: 999px;
+    border: 2px solid var(--line); background: #FAF8F4; font-size: 13px; font-weight: 700; color: #555;
+    cursor: pointer; user-select: none; transition: all 0.15s ease;
+  }
+  .chip input{ position: absolute; opacity: 0; width:0; height:0; }
+  .chip.checked{ background: linear-gradient(120deg, var(--purple), var(--e)); border-color: transparent; color: #fff; }
+  .molho-detail{ margin-top: 10px; background: #FAF8F4; border-radius: 10px; padding: 10px 14px; }
+  .molho-detail .item{ font-size: 13px; color: #444; margin-bottom: 4px; }
+  .molho-detail .item b{ color: var(--ink); font-weight:700; }
+  .meal-divider{
+    margin: 22px 0 4px; padding-top: 14px; border-top: 2px dashed var(--line);
+    font-size: 13.5px; font-weight: 800; color: var(--e-dark);
+  }
+
+  /* ---------- TODAS AS RECEITAS ---------- */
+  .ref-block{ margin-bottom: 30px; }
+  .ref-block h3{ font-size: 15px; margin: 0 0 12px; font-weight: 800; color: var(--purple); }
+  .ref-block .chip-row .chip{ pointer-events: none; }
+  .molho-cards{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .molho-card{
+    background: var(--card); border-radius: 14px; padding: 16px 18px;
+    box-shadow: 0 6px 16px rgba(120,90,50,0.08); border-top: 4px solid var(--j);
+  }
+  .molho-card:nth-child(3n+2){ border-top-color: var(--e); }
+  .molho-card:nth-child(3n){ border-top-color: var(--purple); }
+  .molho-card .mc-nome{ font-weight: 800; font-size: 15px; margin-bottom: 8px; }
+  .molho-card .item{ font-size: 13px; color: #444; margin-bottom: 4px; }
+  .molho-card .item b{ color: var(--ink); font-weight:700; }
+  @media (max-width: 700px){ .molho-cards{ grid-template-columns: 1fr; } }
+
+  /* ---------- HOJE ---------- */
+  .hoje-card{
+    background: var(--card); border-radius: 16px; padding: 20px 22px; margin-bottom: 14px;
+    box-shadow: 0 8px 22px rgba(120,90,50,0.10); border-left: 5px solid var(--j);
+  }
+  .hoje-card h4{ margin: 0 0 8px; font-size: 15px; font-weight: 800; color: var(--e-dark); }
+  .hoje-card .val{ font-size: 15px; font-weight: 700; }
+  .hoje-card .sub{ font-size: 13px; color: #555; margin-top: 4px; }
+  .hoje-empty{ font-size: 14px; color: var(--muted); font-style: italic; }
+  .hoje-status-row{ display:flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
+  .hoje-status{
+    flex:1; min-width: 220px; background: var(--card); border-radius: 14px; padding: 14px 18px;
+    box-shadow: 0 6px 16px rgba(120,90,50,0.08);
+  }
+  .hoje-status b{ display:block; margin-bottom: 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .hoje-status.e b{ color: var(--e-dark); }
+  .hoje-status.j b{ color: var(--j-dark); }
+  .hoje-status .tag{ display:inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700; margin-right: 6px; }
+  .hoje-status .tag.ok{ background: var(--j-soft); color: var(--j-dark); }
+  .hoje-status .tag.no{ background: #F0E4D8; color: var(--muted); }
+
+  /* ---------- PROTEÍNAS ---------- */
+  .protein-group{ margin-bottom: 30px; }
+  .protein-group h3{ font-size: 17px; margin: 0 0 12px; font-weight: 800; }
+  .protein-recipe{
+    background: var(--card); border-radius: 12px; margin-bottom: 8px;
+    box-shadow: 0 4px 12px rgba(120,90,50,0.07); overflow: hidden;
+  }
+  .protein-recipe summary{
+    padding: 13px 18px; font-weight: 700; font-size: 14px; cursor: pointer;
+    list-style: none; display:flex; align-items:center; justify-content: space-between;
+  }
+  .protein-recipe summary::-webkit-details-marker{ display:none; }
+  .protein-recipe summary::after{ content:"+"; font-size: 18px; font-weight: 900; color: var(--purple); }
+  .protein-recipe[open] summary::after{ content:"–"; }
+  .protein-recipe .pr-body{ padding: 0 18px 15px; font-size: 13.5px; }
+  .protein-recipe .pr-body .item{ color: #444; margin-bottom: 5px; }
+  .protein-recipe .pr-body .item b{ color: var(--ink); font-weight: 700; }
+
+  footer{
+    margin-top: 76px; padding: 30px 0 10px; color: var(--muted); font-size: 13.5px; text-align: center; font-weight:600;
+  }
+
+  @media (max-width: 700px){
+    .rules-grid{ grid-template-columns: 1fr; }
+    .diet-cards{ grid-template-columns: 1fr 1fr; }
+    .hero h1{ font-size: 32px; }
+    table.checklist{ font-size: 11.5px; }
+    table.checklist th, table.checklist td{ padding: 7px 4px; }
+    table.workout{ font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="kicker">🏆 DESAFIO DE CASAL · 21 DIAS</span>
+    <h1>Elline vs. Juliana</h1>
+        <div class="dates">📅 13/09/2026 → 03/10/2026</div>
+    <p class="lead">Marquem todo santo dia: treinou, ganhou ponto 💪. Comeu certo, ganhou ponto 🥗. No fim de cada semana, quem tiver menos pontos lava a louça (ou faz o que for combinado) da outra.</p>
+    <div id="sync-badge">🔄 Sincronizando...</div>
+
+    <div class="progress-block">
+      <div class="progress-card big">
+        <div class="pc-top"><span class="pc-label">Progresso geral do desafio</span><span class="pc-pct" id="progress-all-label">0%</span></div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-all-bar"></div></div>
+      </div>
+      <div class="progress-row two">
+        <div class="progress-card e">
+          <div class="pc-top"><span class="pc-label">🧡 Elline</span><span class="pc-pct" id="progress-e-label">0%</span></div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-e-bar"></div></div>
+        </div>
+        <div class="progress-card j">
+          <div class="pc-top"><span class="pc-label">💚 Juliana</span><span class="pc-pct" id="progress-j-label">0%</span></div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-j-bar"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scoreboard">
+      <div class="player-card e">
+        <div class="name">🧡 Elline</div>
+        <div class="field"><span class="lbl">Peso inicial</span><input type="text" id="e-peso-inicial" placeholder="0,0 kg"></div>
+        <div class="field"><span class="lbl">Meta de peso</span><input type="text" id="e-meta-peso" placeholder="0,0 kg"></div>
+        <div class="field"><span class="lbl">Semanas vencidas</span><input type="text" id="e-semanas" placeholder="0 / 3"></div>
+      </div>
+      <div class="player-card j">
+        <div class="name">💚 Juliana</div>
+        <div class="field"><span class="lbl">Peso inicial</span><input type="text" id="j-peso-inicial" placeholder="0,0 kg"></div>
+        <div class="field"><span class="lbl">Meta de peso</span><input type="text" id="j-meta-peso" placeholder="0,0 kg"></div>
+        <div class="field"><span class="lbl">Semanas vencidas</span><input type="text" id="j-semanas" placeholder="0 / 3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="tabs">
+    <button class="tab-btn active" id="btn-tab-desafio" onclick="showTab('desafio')">🏆 Desafio</button>
+    <button class="tab-btn" id="btn-tab-receitas" onclick="showTab('receitas')">🥗 Receitas &amp; Cronograma</button>
+    <button class="tab-btn" id="btn-tab-todas" onclick="showTab('todas')">📖 Todas as Receitas</button>
+    <button class="tab-btn" id="btn-tab-hoje" onclick="showTab('hoje')">📅 Hoje</button>
+    <button class="tab-btn" id="btn-tab-proteinas" onclick="showTab('proteinas')">💪 Proteínas</button>
+  </div>
+
+  <div id="tab-desafio">
+  <section id="regras">
+    <span class="eyebrow">📜 As regras</span>
+    <h2>Como funciona o desafio</h2>
+    <p class="section-sub">21 dias, divididos em 3 semanas. Pontuação diária, resultado semanal, prêmio no final.</p>
+    <div class="rules-grid">
+      <div class="rule-card"><b>⭐ Como pontuar</b>Treino do dia cumprido = 1 ponto. Dieta do dia seguida = 1 ponto. Até 2 pontos por dia, por pessoa.</div>
+      <div class="rule-card"><b>🧹 Quem perde a semana</b>Quem somar menos pontos ao final dos 7 dias vira "funcionária da casa" da outra até a próxima pesagem.</div>
+      <div class="rule-card"><b>🤝 Empate</b>Sem tarefa nenhuma — ou decidam no par-ou-ímpar pra não ficar sem graça.</div>
+      <div class="rule-card"><b>🏆 Prêmio final</b>Quem vencer mais semanas (2 de 3 ou as 3) é a campeã. A perdedora geral cumpre uma tarefa "grande" combinada antes de começar.</div>
+    </div>
+
+    <div class="tasks-card">
+      <b>🧺 Cardápio de tarefas — marquem 3 ou 4 pra valer no desafio</b>
+      <ul>
+        <li><label><input type="checkbox" id="task-1"> Lavar a louça do dia inteiro</label></li>
+        <li><label><input type="checkbox" id="task-2"> Dobrar e guardar toda a roupa</label></li>
+        <li><label><input type="checkbox" id="task-3"> Passar pano na casa</label></li>
+        <li><label><input type="checkbox" id="task-4"> Tirar o lixo a semana toda</label></li>
+        <li><label><input type="checkbox" id="task-5"> Cozinhar o jantar de alguém</label></li>
+        <li><label><input type="checkbox" id="task-6"> Fazer a faxinha do banheiro</label></li>
+      </ul>
+    </div>
+
+    <div class="points-explain" style="margin-top:18px;">
+      <div class="pill"><b>7</b> pontos possíveis de dieta/semana</div>
+      <div class="pill"><b>7</b> pontos possíveis de treino/semana</div>
+      <div class="pill"><b>3</b> semanas no total</div>
+    </div>
+  </section>
+
+  <section id="checklist">
+    <span class="eyebrow">✅ O placar</span>
+    <h2>Checklist diário</h2>
+    <p class="section-sub">Marquem todo dia — atualiza pras duas na hora. No fim de cada semana, somem os pontos e preencham quem ganhou.</p>
+
+    <div class="week-block">
+      <div class="week-badge">🔥 Semana 1</div>
+      <div class="range">13/09 (dom) a 19/09 (sáb) — dias 1 a 7</div>
+      <table class="checklist">
+        <tr>
+          <th class="hdr-date" rowspan="2">Data</th>
+          <th class="hdr-e" colspan="2">Elline</th>
+          <th class="hdr-j" colspan="2">Juliana</th>
+        </tr>
+        <tr><th class="hdr-e">Treino</th><th class="hdr-e">Comeu certo</th><th class="hdr-j">Treino</th><th class="hdr-j">Comeu certo</th></tr>
+        <tr>
+          <td class="date">13/09 — Dom</td>
+          <td class="cell-e"><input type="checkbox" id="d1-e-treino" data-day="1" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d1-e-dieta" data-day="1" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d1-j-treino" data-day="1" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d1-j-dieta" data-day="1" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">14/09 — Seg</td>
+          <td class="cell-e"><input type="checkbox" id="d2-e-treino" data-day="2" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d2-e-dieta" data-day="2" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d2-j-treino" data-day="2" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d2-j-dieta" data-day="2" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">15/09 — Ter</td>
+          <td class="cell-e"><input type="checkbox" id="d3-e-treino" data-day="3" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d3-e-dieta" data-day="3" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d3-j-treino" data-day="3" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d3-j-dieta" data-day="3" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">16/09 — Qua</td>
+          <td class="cell-e"><input type="checkbox" id="d4-e-treino" data-day="4" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d4-e-dieta" data-day="4" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d4-j-treino" data-day="4" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d4-j-dieta" data-day="4" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">17/09 — Qui</td>
+          <td class="cell-e"><input type="checkbox" id="d5-e-treino" data-day="5" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d5-e-dieta" data-day="5" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d5-j-treino" data-day="5" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d5-j-dieta" data-day="5" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">18/09 — Sex</td>
+          <td class="cell-e"><input type="checkbox" id="d6-e-treino" data-day="6" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d6-e-dieta" data-day="6" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d6-j-treino" data-day="6" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d6-j-dieta" data-day="6" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">19/09 — Sáb</td>
+          <td class="cell-e"><input type="checkbox" id="d7-e-treino" data-day="7" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d7-e-dieta" data-day="7" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d7-j-treino" data-day="7" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d7-j-dieta" data-day="7" data-who="j"></td>
+        </tr>
+      </table>
+      <div class="weekend-result">
+        <div class="box"><b>🎯 Total de pontos (automático)</b><div class="auto-points" id="week1-pontos-auto">—</div></div>
+        <div class="box"><b>👑 Vencedora da semana / tarefa</b><input type="text" id="week1-vencedora" placeholder="Nome — tarefa combinada"></div>
+      </div>
+    </div>
+
+    <div class="week-block">
+      <div class="week-badge">⚡ Semana 2</div>
+      <div class="range">20/09 (dom) a 26/09 (sáb) — dias 8 a 14</div>
+      <table class="checklist">
+        <tr>
+          <th class="hdr-date" rowspan="2">Data</th>
+          <th class="hdr-e" colspan="2">Elline</th>
+          <th class="hdr-j" colspan="2">Juliana</th>
+        </tr>
+        <tr><th class="hdr-e">Treino</th><th class="hdr-e">Comeu certo</th><th class="hdr-j">Treino</th><th class="hdr-j">Comeu certo</th></tr>
+        <tr>
+          <td class="date">20/09 — Dom</td>
+          <td class="cell-e"><input type="checkbox" id="d8-e-treino" data-day="8" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d8-e-dieta" data-day="8" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d8-j-treino" data-day="8" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d8-j-dieta" data-day="8" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">21/09 — Seg</td>
+          <td class="cell-e"><input type="checkbox" id="d9-e-treino" data-day="9" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d9-e-dieta" data-day="9" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d9-j-treino" data-day="9" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d9-j-dieta" data-day="9" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">22/09 — Ter</td>
+          <td class="cell-e"><input type="checkbox" id="d10-e-treino" data-day="10" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d10-e-dieta" data-day="10" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d10-j-treino" data-day="10" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d10-j-dieta" data-day="10" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">23/09 — Qua</td>
+          <td class="cell-e"><input type="checkbox" id="d11-e-treino" data-day="11" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d11-e-dieta" data-day="11" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d11-j-treino" data-day="11" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d11-j-dieta" data-day="11" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">24/09 — Qui</td>
+          <td class="cell-e"><input type="checkbox" id="d12-e-treino" data-day="12" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d12-e-dieta" data-day="12" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d12-j-treino" data-day="12" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d12-j-dieta" data-day="12" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">25/09 — Sex</td>
+          <td class="cell-e"><input type="checkbox" id="d13-e-treino" data-day="13" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d13-e-dieta" data-day="13" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d13-j-treino" data-day="13" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d13-j-dieta" data-day="13" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">26/09 — Sáb</td>
+          <td class="cell-e"><input type="checkbox" id="d14-e-treino" data-day="14" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d14-e-dieta" data-day="14" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d14-j-treino" data-day="14" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d14-j-dieta" data-day="14" data-who="j"></td>
+        </tr>
+      </table>
+      <div class="weekend-result">
+        <div class="box"><b>🎯 Total de pontos (automático)</b><div class="auto-points" id="week2-pontos-auto">—</div></div>
+        <div class="box"><b>👑 Vencedora da semana / tarefa</b><input type="text" id="week2-vencedora" placeholder="Nome — tarefa combinada"></div>
+      </div>
+    </div>
+
+    <div class="week-block">
+      <div class="week-badge">🚀 Semana 3</div>
+      <div class="range">27/09 (dom) a 03/10 (sáb) — dias 15 a 21</div>
+      <table class="checklist">
+        <tr>
+          <th class="hdr-date" rowspan="2">Data</th>
+          <th class="hdr-e" colspan="2">Elline</th>
+          <th class="hdr-j" colspan="2">Juliana</th>
+        </tr>
+        <tr><th class="hdr-e">Treino</th><th class="hdr-e">Comeu certo</th><th class="hdr-j">Treino</th><th class="hdr-j">Comeu certo</th></tr>
+        <tr>
+          <td class="date">27/09 — Dom</td>
+          <td class="cell-e"><input type="checkbox" id="d15-e-treino" data-day="15" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d15-e-dieta" data-day="15" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d15-j-treino" data-day="15" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d15-j-dieta" data-day="15" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">28/09 — Seg</td>
+          <td class="cell-e"><input type="checkbox" id="d16-e-treino" data-day="16" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d16-e-dieta" data-day="16" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d16-j-treino" data-day="16" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d16-j-dieta" data-day="16" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">29/09 — Ter</td>
+          <td class="cell-e"><input type="checkbox" id="d17-e-treino" data-day="17" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d17-e-dieta" data-day="17" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d17-j-treino" data-day="17" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d17-j-dieta" data-day="17" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">30/09 — Qua</td>
+          <td class="cell-e"><input type="checkbox" id="d18-e-treino" data-day="18" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d18-e-dieta" data-day="18" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d18-j-treino" data-day="18" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d18-j-dieta" data-day="18" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">01/10 — Qui</td>
+          <td class="cell-e"><input type="checkbox" id="d19-e-treino" data-day="19" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d19-e-dieta" data-day="19" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d19-j-treino" data-day="19" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d19-j-dieta" data-day="19" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">02/10 — Sex</td>
+          <td class="cell-e"><input type="checkbox" id="d20-e-treino" data-day="20" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d20-e-dieta" data-day="20" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d20-j-treino" data-day="20" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d20-j-dieta" data-day="20" data-who="j"></td>
+        </tr>
+        <tr>
+          <td class="date">03/10 — Sáb</td>
+          <td class="cell-e"><input type="checkbox" id="d21-e-treino" data-day="21" data-who="e"></td>
+          <td class="cell-e"><input type="checkbox" id="d21-e-dieta" data-day="21" data-who="e"></td>
+          <td class="cell-j"><input type="checkbox" id="d21-j-treino" data-day="21" data-who="j"></td>
+          <td class="cell-j"><input type="checkbox" id="d21-j-dieta" data-day="21" data-who="j"></td>
+        </tr>
+      </table>
+      <div class="weekend-result">
+        <div class="box"><b>🎯 Total de pontos (automático)</b><div class="auto-points" id="week3-pontos-auto">—</div></div>
+        <div class="box"><b>👑 Vencedora da semana / tarefa</b><input type="text" id="week3-vencedora" placeholder="Nome — tarefa combinada"></div>
+      </div>
+    </div>
+
+    <div class="final-box">
+      <b>🏆 Resultado final do desafio (03/10)</b>
+      <input type="text" id="final-resultado" placeholder="Campeã geral e prêmio/tarefa final combinada">
+    </div>
+  </section>
+
+  <section id="treino">
+    <span class="eyebrow">💪 Treino</span>
+    <h2>Plano semanal de treino</h2>
+    <p class="section-sub">Treino todo santo dia, alternando A/B/C/D — domingo é cardio + abdômen. Mesmo esqueleto nas 3 semanas, aumentem carga conforme o corpo responder.</p>
+
+    <div class="workout-cards">
+      <div class="workout-day-card">
+        <div class="wd-top"><span class="wd-letter">A</span><span class="wd-day">Segunda · Pernas (quadríceps)</span></div>
+        <ul>
+          <li>Agachamento livre <b>3x12</b></li>
+          <li>Leg press <b>3x12</b></li>
+          <li>Passada <b>3x12</b></li>
+          <li>Extensora <b>3x15</b></li>
+          <li>Adutora <b>3x20</b></li>
+          <li>Panturrilha <b>3x15</b></li>
+        </ul>
+      </div>
+
+      <div class="workout-day-card">
+        <div class="wd-top"><span class="wd-letter">B</span><span class="wd-day">Terça · Costas e bíceps</span></div>
+        <ul>
+          <li>Puxada alta <b>3x12</b></li>
+          <li>Remada <b>3x12</b></li>
+          <li>Pulldown polia <b>3x12</b></li>
+          <li>Bíceps martelo <b>3x12</b></li>
+          <li>Bíceps polia <b>3x12</b></li>
+          <li>Abdominal</li>
+        </ul>
+      </div>
+
+      <div class="workout-day-card">
+        <div class="wd-top"><span class="wd-letter">C</span><span class="wd-day">Quarta · Posterior e glúteo</span></div>
+        <ul>
+          <li>Stiff <b>3x12</b></li>
+          <li>Flexora <b>3x12</b></li>
+          <li>Búlgaro <b>3x10</b></li>
+          <li>Adutora <b>3x20</b></li>
+          <li>Coice <b>3x10</b></li>
+        </ul>
+      </div>
+
+      <div class="workout-day-card">
+        <div class="wd-top"><span class="wd-letter">D</span><span class="wd-day">Quinta · Peito, ombro e tríceps</span></div>
+        <ul>
+          <li>Supino (barra ou halter) <b>3x12</b></li>
+          <li>Crossover/voador <b>3x12</b></li>
+          <li>Tríceps corda <b>3x12</b></li>
+          <li>Tríceps barra <b>3x12</b></li>
+          <li>Elevação lateral <b>3x12</b></li>
+          <li>Elevação frontal <b>3x12</b></li>
+          <li>Desenvolvimento <b>3x12</b></li>
+          <li>Abdominal livre</li>
+        </ul>
+      </div>
+
+      <div class="workout-day-card">
+        <div class="wd-top"><span class="wd-letter">A</span><span class="wd-day">Sexta · Pernas (quadríceps)</span></div>
+        <ul>
+          <li>Agachamento livre <b>3x12</b></li>
+          <li>Leg press <b>3x12</b></li>
+          <li>Passada <b>3x12</b></li>
+          <li>Extensora <b>3x15</b></li>
+          <li>Adutora <b>3x20</b></li>
+          <li>Panturrilha <b>3x15</b></li>
+        </ul>
+      </div>
+
+      <div class="workout-day-card">
+        <div class="wd-top"><span class="wd-letter">B</span><span class="wd-day">Sábado · Costas e bíceps</span></div>
+        <ul>
+          <li>Puxada alta <b>3x12</b></li>
+          <li>Remada <b>3x12</b></li>
+          <li>Pulldown polia <b>3x12</b></li>
+          <li>Bíceps martelo <b>3x12</b></li>
+          <li>Bíceps polia <b>3x12</b></li>
+          <li>Abdominal</li>
+        </ul>
+      </div>
+
+      <div class="workout-day-card">
+        <div class="wd-top"><span class="wd-letter">🏃</span><span class="wd-day">Domingo · Cardio + Abdômen</span></div>
+        <ul>
+          <li>Cardio (caminhada rápida, bike ou corrida leve) <b>25-30 min</b></li>
+          <li>Abdominal livre <b>3x20</b></li>
+          <li>Prancha <b>3x30-45s</b></li>
+          <li>Elevação de pernas <b>3x15</b></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- fim tab-desafio -->
+
+  <div id="tab-receitas" style="display:none">
+  <section id="alimentacao">
+    <span class="eyebrow">🥗 Receitas &amp; Cronograma</span>
+    <h2>Montem o cardápio de cada dia</h2>
+    <p class="section-sub">Café, almoço (por blocos: folhosos, vegetais crus, toque doce, proteína, extras e molho), lanche e jantar. Tudo fica salvo e sincronizado pras duas.</p>
+
+    <div id="recipe-days"></div>
+
+    <div class="meals-note">
+      🍳 <b>Café da manhã, lanche e jantar</b> seguem o plano de 4 refeições (~1.800 kcal, 130g de proteína/dia):
+      omelete com aveia no café, iogurte com whey e frutas vermelhas no lanche, proteína grelhada com legumes assados no jantar.
+      Sábado pode ter 1 refeição livre. Lista de compras está num arquivo separado.
+    </div>
+  </section>
+  </div><!-- fim tab-receitas -->
+
+  <div id="tab-todas" style="display:none">
+  <section id="todas-receitas">
+    <span class="eyebrow">📖 Guia completo</span>
+    <h2>Todas as receitas</h2>
+    <p class="section-sub">Referência de tudo que pode entrar na salada, e a receita completa de cada um dos molhos.</p>
+
+    <div class="ref-block">
+      <h3>1º · Vegetais folhosos</h3>
+      <div class="chip-row" id="ref-folhosos"></div>
+    </div>
+    <div class="ref-block">
+      <h3>2º · Vegetais, legumes ou grãos crus</h3>
+      <div class="chip-row" id="ref-vegetais"></div>
+    </div>
+    <div class="ref-block">
+      <h3>3º · Sabor extra: crocante ou doce</h3>
+      <div class="chip-row" id="ref-doces"></div>
+    </div>
+    <div class="ref-block">
+      <h3>4º · Proteínas</h3>
+      <div class="chip-row" id="ref-proteinas"></div>
+    </div>
+    <div class="ref-block">
+      <h3>5º · Extras</h3>
+      <div class="chip-row" id="ref-extras"></div>
+    </div>
+    <div class="ref-block">
+      <h3>6º · Molhos — receita completa</h3>
+      <div class="molho-cards" id="ref-molhos"></div>
+    </div>
+  </section>
+  </div><!-- fim tab-todas -->
+
+  <div id="tab-hoje" style="display:none">
+  <section id="hoje">
+    <span class="eyebrow">📅 Hoje</span>
+    <h2 id="hoje-titulo">Carregando...</h2>
+    <p class="section-sub" id="hoje-subtitulo"></p>
+    <div id="hoje-conteudo"></div>
+  </section>
+  </div><!-- fim tab-hoje -->
+
+  <div id="tab-proteinas" style="display:none">
+  <section id="proteinas-tab">
+    <span class="eyebrow">💪 Diversifique</span>
+    <h2>Receitas de proteína</h2>
+    <p class="section-sub">Bastante opção pra não enjoar — clique em cada receita pra ver ingredientes e modo de preparo.</p>
+    <div id="proteinas-content"></div>
+  </section>
+  </div><!-- fim tab-proteinas -->
+
+  <footer>🏆 Desafio 21 Dias — Elline & Juliana · 13/09 a 03/10/2026 · boa sorte, e que vença a melhor (mas sem trapaça)</footer>
+</div>
+
+<script>
+  var FOLHOSOS = ["Alface", "Agrião", "Rúcula", "Couve"];
+  var VEGETAIS = ["Repolho roxo", "Cenoura", "Beterraba", "Milho", "Brócolis", "Couve-flor", "Pepino", "Tomate cereja", "Cebola"];
+  var DOCES = ["Passas", "Abacaxi", "Manga", "Maçã", "Morango", "Nozes", "Castanhas"];
+  var PROTEINAS = ["Frango desfiado", "Atum em lata", "Ovos (galinha ou codorna)", "Queijo Minas", "Camarão", "Rosbife", "Carne picada"];
+  var EXTRAS = ["Macarrão integral", "Croutons", "Quinoa", "Palmito", "Alho dourado", "Batata palha", "Tomate seco", "Ervilha", "Cogumelos", "Alho poró", "Grão de bico"];
+  var MOLHOS = {"caesar_fit": {"nome": "Caesar Fit", "ing": "3/4 xíc. iogurte natural, azeite, limão, alho, 2 col. parmesão, sal", "prep": "Bata tudo no mixer ou liquidificador e sirva."}, "verde_refrescante": {"nome": "Verde Refrescante I", "ing": "1 pote iogurte natural, 3 col. azeite, limão, 8 folhas manjericão, 2 col. parmesão, sal", "prep": "Bata tudo no mixer ou liquidificador e sirva."}, "refrescante_ii": {"nome": "Refrescante II", "ing": "2 copos iogurte natural, 2 col. azeite, 1/2 limão, sal, pimenta, 1 col. hortelã, 2 dentes de alho", "prep": "Bata tudo no liquidificador até homogêneo e leve à geladeira."}, "citrico": {"nome": "Molho Cítrico", "ing": "Caldo de 5 limões, meia cebola picada, 1 col. mel, sal", "prep": "Misture tudo com um garfo."}, "picante": {"nome": "Molho Picante", "ing": "1/2 xíc. suco de limão, 3 col. mel, 3 col. mostarda, pimenta calabresa/páprica", "prep": "Misture com 1/2 xícara de água e sirva."}, "ervas_finas": {"nome": "Molho de Ervas Finas", "ing": "1/2 xíc. azeite, limão siciliano, 1 col. salsa, 1 col. manjericão, 1 col. alecrim", "prep": "Misture tudo com um garfo."}, "mostarda_mel": {"nome": "Mostarda e Mel", "ing": "2 col. mel, 2 col. mostarda, pimenta-do-reino, sal", "prep": "Misture muito bem todos os ingredientes."}, "limao_alho": {"nome": "Molho Limão e Alho", "ing": "Caldo de 2 limões, 3 col. azeite, 1 dente de alho, sal e pimenta", "prep": "Misture até incorporar."}, "balsamico_mel": {"nome": "Balsâmico e Mel", "ing": "1 col. vinagre balsâmico, 3 col. azeite, 1 col. chá mel, sal", "prep": "Misture até incorporar."}, "vinagre_balsamico_gergelim": {"nome": "Vinagre Balsâmico com Gergelim", "ing": "10 col. azeite, 3 col. vinagre balsâmico, 2 col. água mineral, 1 col. limão, 2 col. gergelim, sal", "prep": "Misture tudo. Pode adicionar 1/2 col. de mel se quiser."}, "tartaro_light": {"nome": "Molho Tártaro Light", "ing": "1/2 xíc. requeijão light, 1/2 xíc. picles picado, 1 col. alcaparras, 1 col. molho inglês, 1 col. mostarda, ervas finas, vinagre (opcional)", "prep": "Misture bem e leve à geladeira 15 min antes de servir."}, "ervas_cottage": {"nome": "Molho de Ervas e Cottage", "ing": "2 xíc. queijo cottage, 2 col. suco de limão, 2 col. manjericão fresco, sal", "prep": "Amasse o cottage com garfo e misture o resto."}, "maionese_abacate": {"nome": "Maionese de Abacate", "ing": "Abacate, maço de salsinha, 1 dente de alho, 1 limão, sal, azeite a gosto", "prep": "Bata tudo no mixer ou liquidificador e sirva."}, "citricos": {"nome": "Molho de Cítricos", "ing": "Laranja, lima da pérsia, mexerica, limão cravo, 4 col. azeite extra-virgem, sal", "prep": "Esprema os cítricos e emulsione com sal e azeite. Sirva na hora."}, "iogurte_linhaca": {"nome": "Molho de Iogurte e Linhaça", "ing": "1 pote iogurte desnatado, 1 col. azeite, 1/2 limão, 2 col. chá mostarda, 1 col. hortelã, 1 col. chá linhaça", "prep": "Misture os ingredientes e sirva sobre a salada."}, "oriental": {"nome": "Molho Oriental", "ing": "3 col. shoyu, 5 col. azeite, 1/2 limão, 1 col. chá gengibre ralado, sal", "prep": "Misture todos os ingredientes."}, "italiano": {"nome": "Molho Italiano", "ing": "1/3 xíc. azeite, 2 col. vinagre de vinho tinto, 1/2 col. alho desidratado, 1/2 col. orégano/manjericão seco, pimenta calabresa, sal", "prep": "Misture tudo num pote de vidro, feche e chacoalhe. Leve à geladeira 1 dia para apurar (dura até 15 dias)."}, "molho_caesar": {"nome": "Molho Caesar", "ing": "3/4 xíc. iogurte natural, suco de 1 limão, 1 col. mostarda, 1 col. azeite, 1 pitada de orégano, sal", "prep": "Misture bem todos os ingredientes numa vasilha."}};
+  var WEEK_DAYS = [{"id": "seg", "label": "Segunda"}, {"id": "ter", "label": "Terça"}, {"id": "qua", "label": "Quarta"}, {"id": "qui", "label": "Quinta"}, {"id": "sex", "label": "Sexta"}];
+  var CAFES = ["Omelete com aveia e fruta", "Iogurte com granola e mel", "Tapioca com ovo e queijo", "Pão integral com abacate e ovo", "Vitamina de banana com whey", "Panqueca de aveia com frutas vermelhas", "Banana da terra frita com ovo mexido", "Tapioca com queijo coalho e banana da terra", "Vitamina de mamão com aveia", "Salada de frutas (mamão, banana, morango, melão)", "Cuscuz com ovo e queijo minas", "Iogurte com frutas picadas (banana, maçã, uva)", "Tapioca com frango desfiado"];
+  var LANCHES = ["Iogurte com frutas vermelhas", "Mix de castanhas", "Queijo minas com torrada integral", "Smoothie de frutas", "2 ovos cozidos + fruta", "Barrinha proteica + fruta", "Banana com pasta de amendoim", "Salada de frutas com iogurte"];
+  var JANTARES = ["Proteína grelhada + legumes assados", "Sopa de legumes com frango desfiado", "Omelete de legumes", "Salada completa com atum", "Wrap integral de frango", "Peixe assado com purê de abóbora", "Cuscuz com ovo e frango desfiado", "Macaxeira cozida com carne moída", "Cuscuz de tapioca com queijo coalho e frango", "Macaxeira assada com filé de frango grelhado", "Salada de macarrão integral com atum e legumes", "Salada de macarrão com frango desfiado e tomate seco", "Salada de macarrão parafuso com camarão", "Panqueca de frango com salada verde", "Sopa de abóbora com frango desfiado", "Tapioca com frango desfiado e queijo", "Tapioca com atum e requeijão light", "Tapioca com ovo e queijo coalho"];
+  var DAY_TO_WEEKDAY = {0: null, 1: "seg", 2: "ter", 3: "qua", 4: "qui", 5: "sex", 6: null};
+  var CHALLENGE_START = new Date(2026, 8, 13);
+
+  function slugify(s){
+    return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase();
+  }
+
+  function chipGroup(dayId, groupKey, items, minLabel){
+    var html = '<div class="block-label">' + minLabel + '</div><div class="chip-row">';
+    items.forEach(function(item){
+      var key = slugify(item);
+      var id = 'd-' + dayId + '-' + groupKey + '-' + key;
+      html += '<label class="chip" for="' + id + '"><input type="checkbox" id="' + id + '"><span>' + item + '</span></label>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function selectGroup(dayId, groupKey, items, label, extraAttrs){
+    var id = 'd-' + dayId + '-' + groupKey;
+    var html = '<div class="block-label">' + label + '</div><select id="' + id + '" ' + (extraAttrs||'') + '><option value="">— escolher —</option>';
+    items.forEach(function(item){
+      html += '<option value="' + item + '">' + item + '</option>';
+    });
+    html += '</select>';
+    return html;
+  }
+
+  function molhoSelect(dayId){
+    var id = 'd-' + dayId + '-molho';
+    var html = '<div class="block-label">6º · Adicione 1 molho</div><select id="' + id + '" data-day="' + dayId + '" data-role="molho"><option value="">— escolher —</option>';
+    Object.keys(MOLHOS).forEach(function(k){
+      html += '<option value="' + k + '">' + MOLHOS[k].nome + '</option>';
+    });
+    html += '</select><div class="molho-detail" id="molho-detail-' + dayId + '"></div>';
+    return html;
+  }
+
+  function renderMolhoDetail(dayId){
+    var sel = document.getElementById('d-' + dayId + '-molho');
+    var box = document.getElementById('molho-detail-' + dayId);
+    if(!sel || !box) return;
+    var m = MOLHOS[sel.value];
+    if(!m){ box.innerHTML = ''; return; }
+    box.innerHTML = '<div class="item"><b>Ingredientes:</b> ' + m.ing + '</div><div class="item"><b>Preparo:</b> ' + m.prep + '</div>';
+  }
+
+  function buildRecipeDays(){
+    var container = document.getElementById('recipe-days');
+    var html = '';
+    WEEK_DAYS.forEach(function(d){
+      html += '<div class="recipe-day-card">';
+      html += '<div class="rd-top"><span class="rd-day">' + d.label + '</span></div>';
+      html += selectGroup(d.id, 'cafe', CAFES, '🌅 Café da manhã');
+      html += '<div class="meal-divider">🥗 Almoço — monte a salada</div>';
+      html += chipGroup(d.id, 'folha', FOLHOSOS, '1º · Escolha no mínimo 2 vegetais folhosos');
+      html += chipGroup(d.id, 'veg', VEGETAIS, '2º · Escolha no mínimo 2 vegetais, legumes ou grãos crus');
+      html += chipGroup(d.id, 'doce', DOCES, '3º · Sabor extra (opcional): crocante ou doce');
+      html += selectGroup(d.id, 'proteina', PROTEINAS, '4º · Adicione 1 proteína');
+      html += chipGroup(d.id, 'extra', EXTRAS, '5º · Adicione extras (opcional)');
+      html += molhoSelect(d.id);
+      html += selectGroup(d.id, 'lanche', LANCHES, '🍎 Lanche da tarde');
+      html += selectGroup(d.id, 'jantar', JANTARES, '🌙 Jantar');
+      html += '</div>';
+    });
+    container.innerHTML = html;
+    WEEK_DAYS.forEach(function(d){ renderMolhoDetail(d.id); });
+  }
+
+  function buildTodasReceitas(){
+    function fillChips(containerId, items){
+      var el = document.getElementById(containerId);
+      if(!el) return;
+      el.innerHTML = items.map(function(i){ return '<span class="chip">' + i + '</span>'; }).join('');
+    }
+    fillChips('ref-folhosos', FOLHOSOS);
+    fillChips('ref-vegetais', VEGETAIS);
+    fillChips('ref-doces', DOCES);
+    fillChips('ref-proteinas', PROTEINAS);
+    fillChips('ref-extras', EXTRAS);
+
+    var box = document.getElementById('ref-molhos');
+    if(box){
+      var html = '';
+      Object.keys(MOLHOS).forEach(function(k){
+        var m = MOLHOS[k];
+        html += '<div class="molho-card">' +
+          '<div class="mc-nome">' + m.nome + '</div>' +
+          '<div class="item"><b>Ingredientes:</b> ' + m.ing + '</div>' +
+          '<div class="item"><b>Preparo:</b> ' + m.prep + '</div>' +
+          '</div>';
+      });
+      box.innerHTML = html;
+    }
+  }
+
+  function fieldLabel(id){
+    var el = document.getElementById(id);
+    if(!el) return null;
+    if(el.value) return el.value;
+    return null;
+  }
+
+  function checkedChipLabels(dayId, groupKey){
+    var chips = document.querySelectorAll('input[id^="d-' + dayId + '-' + groupKey + '-"]');
+    var out = [];
+    chips.forEach(function(c){ if(c.checked) out.push(c.closest('.chip').querySelector('span').textContent); });
+    return out;
+  }
+
+  function buildHojeTab(){
+    var titulo = document.getElementById('hoje-titulo');
+    var sub = document.getElementById('hoje-subtitulo');
+    var box = document.getElementById('hoje-conteudo');
+    if(!titulo || !box) return;
+
+    var hoje = new Date();
+    var hojeSemHora = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    var diffDias = Math.round((hojeSemHora - CHALLENGE_START) / 86400000);
+    var numeroDia = diffDias + 1;
+    var dataFmt = hojeSemHora.toLocaleDateString('pt-BR');
+
+    if(numeroDia < 1 || numeroDia > 21){
+      titulo.textContent = dataFmt;
+      sub.textContent = numeroDia < 1 ? 'O desafio ainda não começou (começa 13/09/2026).' : 'O desafio já terminou! Confiram o resultado final na aba Desafio.';
+      box.innerHTML = '';
+      return;
+    }
+
+    var weekdayKey = DAY_TO_WEEKDAY[hojeSemHora.getDay()];
+    titulo.textContent = dataFmt + ' — Dia ' + numeroDia + ' de 21';
+
+    if(!weekdayKey){
+      sub.textContent = 'Fim de semana — dia livre. Podem ter 1 refeição livre e treino leve/opcional.';
+      box.innerHTML = '';
+      return;
+    }
+
+    sub.textContent = 'O que vale hoje, direto do cronograma da semana:';
+
+    var html = '';
+
+    var cafe = fieldLabel('d-' + weekdayKey + '-cafe');
+    html += '<div class="hoje-card"><h4>🌅 Café da manhã</h4><div class="val">' + (cafe || '<span class="hoje-empty">ainda não escolhido — vá na aba Receitas</span>') + '</div></div>';
+
+    var folhas = checkedChipLabels(weekdayKey, 'folha');
+    var vegs = checkedChipLabels(weekdayKey, 'veg');
+    var doces = checkedChipLabels(weekdayKey, 'doce');
+    var proteina = fieldLabel('d-' + weekdayKey + '-proteina');
+    var extras = checkedChipLabels(weekdayKey, 'extra');
+    var molhoSel = document.getElementById('d-' + weekdayKey + '-molho');
+    var molhoNome = (molhoSel && molhoSel.value && MOLHOS[molhoSel.value]) ? MOLHOS[molhoSel.value].nome : null;
+
+    var almocoMontado = folhas.length || vegs.length || proteina;
+    html += '<div class="hoje-card"><h4>🥗 Almoço</h4>';
+    if(almocoMontado){
+      html += '<div class="val">' + (proteina || 'proteína não escolhida') + '</div>';
+      html += '<div class="sub">Folhosos: ' + (folhas.join(', ') || '—') + '</div>';
+      html += '<div class="sub">Vegetais: ' + (vegs.join(', ') || '—') + '</div>';
+      if(doces.length) html += '<div class="sub">Toque doce: ' + doces.join(', ') + '</div>';
+      if(extras.length) html += '<div class="sub">Extras: ' + extras.join(', ') + '</div>';
+      html += '<div class="sub">Molho: ' + (molhoNome || '—') + '</div>';
+    } else {
+      html += '<div class="hoje-empty">ainda não montado — vá na aba Receitas</div>';
+    }
+    html += '</div>';
+
+    var lanche = fieldLabel('d-' + weekdayKey + '-lanche');
+    html += '<div class="hoje-card"><h4>🍎 Lanche da tarde</h4><div class="val">' + (lanche || '<span class="hoje-empty">ainda não escolhido</span>') + '</div></div>';
+
+    var jantar = fieldLabel('d-' + weekdayKey + '-jantar');
+    html += '<div class="hoje-card"><h4>🌙 Jantar</h4><div class="val">' + (jantar || '<span class="hoje-empty">ainda não escolhido</span>') + '</div></div>';
+
+    var eTreino = document.getElementById('d' + numeroDia + '-e-treino');
+    var eDieta = document.getElementById('d' + numeroDia + '-e-dieta');
+    var jTreino = document.getElementById('d' + numeroDia + '-j-treino');
+    var jDieta = document.getElementById('d' + numeroDia + '-j-dieta');
+    html += '<div class="hoje-status-row">';
+    html += '<div class="hoje-status e"><b>🧡 Elline hoje</b>' +
+      '<span class="tag ' + (eTreino && eTreino.checked ? 'ok' : 'no') + '">Treino ' + (eTreino && eTreino.checked ? '✓' : '—') + '</span>' +
+      '<span class="tag ' + (eDieta && eDieta.checked ? 'ok' : 'no') + '">Dieta ' + (eDieta && eDieta.checked ? '✓' : '—') + '</span></div>';
+    html += '<div class="hoje-status j"><b>💚 Juliana hoje</b>' +
+      '<span class="tag ' + (jTreino && jTreino.checked ? 'ok' : 'no') + '">Treino ' + (jTreino && jTreino.checked ? '✓' : '—') + '</span>' +
+      '<span class="tag ' + (jDieta && jDieta.checked ? 'ok' : 'no') + '">Dieta ' + (jDieta && jDieta.checked ? '✓' : '—') + '</span></div>';
+    html += '</div>';
+
+    box.innerHTML = html;
+  }
+
+  var PROTEIN_RECIPES = {
+    frango: { label: "🍗 Frango", items: [
+      { nome: "Frango grelhado ao limão e alecrim", ing: "Peito de frango, suco de limão, alecrim, azeite, sal, pimenta", prep: "Tempere e marine 15 min. Grelhe 4-5 min de cada lado até dourar." },
+      { nome: "Frango ao curry com leite de coco", ing: "Peito de frango, curry em pó, leite de coco, azeite, sal", prep: "Corte em cubos, refogue no azeite, adicione curry e leite de coco. Cozinhe 8-10 min." },
+      { nome: "Frango desfiado temperado", ing: "Peito de frango, azeite, limão, cebola, coentro, sal", prep: "Cozinhe o frango, desfie e refogue rapidamente com cebola e temperos." },
+      { nome: "Frango assado com páprica e mostarda", ing: "Peito de frango, páprica, mostarda, azeite, alho, sal", prep: "Misture os temperos, cubra o frango e asse a 200°C por 25 min." },
+      { nome: "Frango ao alho e ervas", ing: "Peito de frango, alho picado, tomilho, orégano, azeite, limão", prep: "Marine 20 min e grelhe ou asse até dourar por igual." },
+      { nome: "Espetinho de frango com pimentão", ing: "Peito de frango em cubos, pimentão, cebola, azeite, páprica, sal", prep: "Monte os espetos alternando frango e legumes. Grelhe virando até dourar." }
+    ]},
+    peixe: { label: "🐟 Peixe e salmão", items: [
+      { nome: "Salmão assado com ervas", ing: "Filé de salmão, azeite, sal, pimenta, endro ou salsinha", prep: "Tempere e leve ao forno a 200°C por 12-15 min." },
+      { nome: "Salmão grelhado ao alho e limão", ing: "Filé de salmão, alho picado, limão, azeite, sal", prep: "Grelhe com a pele para baixo primeiro, 4 min de cada lado." },
+      { nome: "Tilápia ao forno com limão e páprica", ing: "Filé de tilápia, limão, páprica, azeite, sal", prep: "Tempere e asse a 200°C por 15-18 min até soltar fácil com o garfo." },
+      { nome: "Peixe branco ao molho de mostarda e mel", ing: "Filé de peixe branco, mostarda, mel, limão, azeite", prep: "Misture o molho, cubra o peixe e grelhe ou asse por 12-15 min." },
+      { nome: "Peixe grelhado ao gengibre e shoyu", ing: "Filé de peixe, shoyu, gengibre ralado, azeite", prep: "Marine 10 min e grelhe rapidamente dos dois lados." }
+    ]},
+    carne: { label: "🥩 Carne vermelha", items: [
+      { nome: "Carne com cominho e páprica", ing: "Carne moída ou bife em tiras, cominho, páprica, azeite, sal", prep: "Tempere e sele em fogo alto até dourar bem." },
+      { nome: "Bife acebolado", ing: "Bife, cebola em rodelas, azeite, sal, pimenta", prep: "Grelhe o bife, reserve, refogue a cebola na mesma frigideira e sirva por cima." },
+      { nome: "Carne moída refogada com legumes", ing: "Carne moída, cenoura, ervilha, cebola, tomate, sal", prep: "Refogue a cebola, adicione a carne e os legumes, cozinhe até apurar." },
+      { nome: "Rosbife fatiado", ing: "Peça de carne (tipo alcatra), alecrim, alho, azeite, sal", prep: "Tempere, sele todos os lados e asse a 180°C até o ponto desejado. Deixe descansar antes de fatiar fino." },
+      { nome: "Carne ao molho de mostarda e mel", ing: "Bife, mostarda, mel, azeite, sal", prep: "Grelhe o bife e finalize com o molho de mostarda e mel levemente aquecido." }
+    ]},
+    ovos: { label: "🥚 Ovos", items: [
+      { nome: "Ovos mexidos com espinafre", ing: "Ovos, espinafre, azeite, sal", prep: "Refogue o espinafre rapidamente, adicione os ovos batidos e mexa até cozinhar." },
+      { nome: "Omelete de claras com queijo", ing: "Claras de ovo, queijo minas, tomate picado, sal", prep: "Bata as claras, adicione o restante e cozinhe em frigideira antiaderente." },
+      { nome: "Ovos cozidos temperados", ing: "Ovos, azeite, páprica, sal", prep: "Cozinhe os ovos por 8-10 min, descasque e tempere com azeite e páprica." },
+      { nome: "Ovos pochê com abacate", ing: "Ovos, abacate, limão, sal", prep: "Escalfe os ovos em água quente com vinagre por 3 min. Sirva sobre o abacate amassado com limão." }
+    ]},
+    camarao: { label: "🍤 Camarão", items: [
+      { nome: "Camarão ao alho e limão", ing: "Camarão, alho picado, limão, azeite, sal", prep: "Salteie em fogo alto por 2-3 min de cada lado, sem passar do ponto." },
+      { nome: "Camarão na chapa com páprica", ing: "Camarão, páprica, azeite, sal", prep: "Tempere e grelhe rapidamente em fogo alto até ficar rosado." },
+      { nome: "Camarão ao curry leve", ing: "Camarão, curry em pó, leite de coco, azeite", prep: "Salteie o camarão, adicione curry e leite de coco, cozinhe por 5 min." }
+    ]},
+    atum: { label: "🐟 Atum", items: [
+      { nome: "Atum temperado com limão e cebola", ing: "Atum em lata, limão, cebola picada, azeite, sal", prep: "Escorra o atum e misture com os temperos." },
+      { nome: "Atum com maçã picada", ing: "Atum em lata, maçã picada, iogurte natural, sal", prep: "Misture tudo para uma versão levemente adocicada." }
+    ]},
+    vegetariano: { label: "🧀 Vegetariana", items: [
+      { nome: "Queijo minas grelhado", ing: "Queijo minas em postas, orégano, azeite", prep: "Grelhe as postas em fogo médio até dourar dos dois lados." },
+      { nome: "Grão-de-bico temperado", ing: "Grão-de-bico cozido, cominho, páprica, azeite, limão, sal", prep: "Misture todos os ingredientes e sirva frio ou levemente salteado." }
+    ]}
+  };
+
+  function buildProteinasTab(){
+    var box = document.getElementById('proteinas-content');
+    if(!box) return;
+    var html = '';
+    Object.keys(PROTEIN_RECIPES).forEach(function(k){
+      var grupo = PROTEIN_RECIPES[k];
+      html += '<div class="protein-group"><h3>' + grupo.label + '</h3>';
+      grupo.items.forEach(function(r){
+        html += '<details class="protein-recipe"><summary>' + r.nome + '</summary>' +
+          '<div class="pr-body">' +
+          '<div class="item"><b>Ingredientes:</b> ' + r.ing + '</div>' +
+          '<div class="item"><b>Modo de preparo:</b> ' + r.prep + '</div>' +
+          '</div></details>';
+      });
+      html += '</div>';
+    });
+    box.innerHTML = html;
+  }
+
+  function showTab(name){
+    document.getElementById('tab-desafio').style.display = (name === 'desafio') ? '' : 'none';
+    document.getElementById('tab-receitas').style.display = (name === 'receitas') ? '' : 'none';
+    document.getElementById('tab-todas').style.display = (name === 'todas') ? '' : 'none';
+    document.getElementById('tab-hoje').style.display = (name === 'hoje') ? '' : 'none';
+    document.getElementById('tab-proteinas').style.display = (name === 'proteinas') ? '' : 'none';
+    document.getElementById('btn-tab-desafio').classList.toggle('active', name === 'desafio');
+    document.getElementById('btn-tab-receitas').classList.toggle('active', name === 'receitas');
+    document.getElementById('btn-tab-todas').classList.toggle('active', name === 'todas');
+    document.getElementById('btn-tab-hoje').classList.toggle('active', name === 'hoje');
+    document.getElementById('btn-tab-proteinas').classList.toggle('active', name === 'proteinas');
+    if(name === 'hoje' && typeof buildHojeTab === 'function') buildHojeTab();
+  }
+</script>
+<script>
+(function(){
+  var DB_URL = 'https://desafio21-37862-default-rtdb.firebaseio.com/desafio';
+  var badge = document.getElementById('sync-badge');
+  var applyingRemote = false;
+
+  function getInputs(){
+    return Array.prototype.slice.call(document.querySelectorAll('input[id], select[id]'));
+  }
+
+  function setBadge(text, offline){
+    badge.textContent = text;
+    badge.classList.toggle('offline', !!offline);
+  }
+
+  function applyValue(el, val){
+    if(val === undefined || val === null) return;
+    if(el.type === 'checkbox') {
+      el.checked = !!val;
+      if(el.closest && el.closest('.chip')) el.closest('.chip').classList.toggle('checked', el.checked);
+    }
+    else el.value = val;
+    if(el.tagName === 'SELECT' && el.dataset && el.dataset.role === 'molho' && typeof renderMolhoDetail === 'function'){
+      renderMolhoDetail(el.dataset.day);
+    }
+  }
+
+  function applyData(data){
+    if(!data) return;
+    applyingRemote = true;
+    getInputs().forEach(function(el){
+      if(data[el.id] !== undefined) applyValue(el, data[el.id]);
+    });
+    applyingRemote = false;
+    updateProgress();
+  }
+
+  function loadInitial(){
+    setBadge('🔄 Sincronizando...', false);
+    fetch(DB_URL + '.json')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        applyData(data);
+        setBadge('✅ Sincronizado com Juliana/Elline', false);
+      })
+      .catch(function(){ setBadge('⚠️ Sem conexão — salvando só aqui', true); });
+  }
+
+  function saveField(id, value){
+    fetch(DB_URL + '/' + id + '.json', {
+      method: 'PUT',
+      body: JSON.stringify(value)
+    }).then(function(){
+      setBadge('✅ Sincronizado com Juliana/Elline', false);
+    }).catch(function(){
+      setBadge('⚠️ Sem conexão — tentando de novo...', true);
+    });
+  }
+
+  function listenRealtime(){
+    try {
+      var es = new EventSource(DB_URL + '.json');
+      es.addEventListener('put', function(e){
+        try {
+          var payload = JSON.parse(e.data);
+          if(payload.path === '/'){
+            applyData(payload.data);
+          } else {
+            var id = payload.path.replace('/', '');
+            var el = document.getElementById(id);
+            if(el){ applyingRemote = true; applyValue(el, payload.data); applyingRemote = false; updateProgress(); }
+          }
+        } catch(err){}
+      });
+      es.addEventListener('patch', function(e){
+        try {
+          var payload = JSON.parse(e.data);
+          applyingRemote = true;
+          Object.keys(payload.data || {}).forEach(function(key){
+            var el = document.getElementById(key);
+            if(el) applyValue(el, payload.data[key]);
+          });
+          applyingRemote = false;
+          updateProgress();
+        } catch(err){}
+      });
+      es.onerror = function(){ setBadge('⚠️ Reconectando...', true); };
+    } catch(err){ /* navegador sem suporte a EventSource */ }
+  }
+
+  function pct(done, total){ return total ? Math.round(done/total*100) : 0; }
+
+  var WEEK_RANGES = { 1: [1,7], 2: [8,14], 3: [15,21] };
+
+  function updateWeeklyPoints(){
+    Object.keys(WEEK_RANGES).forEach(function(w){
+      var range = WEEK_RANGES[w];
+      var box = document.getElementById('week' + w + '-pontos-auto');
+      if(!box) return;
+      var pontos = { e: 0, j: 0 };
+      for(var day = range[0]; day <= range[1]; day++){
+        ['e','j'].forEach(function(who){
+          var t = document.getElementById('d' + day + '-' + who + '-treino');
+          var d = document.getElementById('d' + day + '-' + who + '-dieta');
+          if(t && t.checked) pontos[who]++;
+          if(d && d.checked) pontos[who]++;
+        });
+      }
+      var lead = '';
+      if(pontos.e !== pontos.j){
+        lead = '<span class="lead">' + (pontos.e > pontos.j ? '🧡 Elline na frente' : '💚 Juliana na frente') + '</span>';
+      } else {
+        lead = '<span class="lead">🤝 empate</span>';
+      }
+      box.innerHTML = '<span class="e">Elline: ' + pontos.e + '</span> &nbsp;·&nbsp; <span class="j">Juliana: ' + pontos.j + '</span>' + lead;
+    });
+  }
+
+  function updateProgress(){
+    var all = document.querySelectorAll('input[type=checkbox][data-day]');
+    var totalAll = all.length, doneAll = 0;
+    all.forEach(function(el){ if(el.checked) doneAll++; });
+    document.getElementById('progress-all-bar').style.width = pct(doneAll, totalAll) + '%';
+    document.getElementById('progress-all-label').textContent = pct(doneAll, totalAll) + '%';
+
+    ['e','j'].forEach(function(who){
+      var els = document.querySelectorAll('input[type=checkbox][data-who="' + who + '"]');
+      var t = els.length, d = 0;
+      els.forEach(function(el){ if(el.checked) d++; });
+      document.getElementById('progress-' + who + '-bar').style.width = pct(d, t) + '%';
+      document.getElementById('progress-' + who + '-label').textContent = pct(d, t) + '%';
+    });
+
+    updateWeeklyPoints();
+    if(typeof buildHojeTab === 'function') buildHojeTab();
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    if(typeof buildRecipeDays === 'function') buildRecipeDays();
+    if(typeof buildTodasReceitas === 'function') buildTodasReceitas();
+    if(typeof buildProteinasTab === 'function') buildProteinasTab();
+    if(typeof buildHojeTab === 'function') buildHojeTab();
+    loadInitial();
+    listenRealtime();
+    getInputs().forEach(function(el){
+      el.addEventListener('change', function(){
+        if(applyingRemote) return;
+        var value = el.type === 'checkbox' ? el.checked : el.value;
+        saveField(el.id, value);
+        if(el.type === 'checkbox' && el.closest && el.closest('.chip')){
+          el.closest('.chip').classList.toggle('checked', el.checked);
+        }
+        if(el.tagName === 'SELECT' && el.dataset && el.dataset.role === 'molho' && typeof renderMolhoDetail === 'function'){
+          renderMolhoDetail(el.dataset.day);
+        }
+        updateProgress();
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
